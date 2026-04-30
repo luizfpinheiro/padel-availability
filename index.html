@@ -256,7 +256,7 @@
     <div class="top-bar">
       <div class="live">
         <div class="dot" id="status-dot"></div>
-        Live · auto-refresh every 60s
+        Live · auto-refresh every 10s
       </div>
       <span class="updated" id="last-updated"></span>
       <button onclick="loadData()">Refresh</button>
@@ -447,7 +447,7 @@
 
       async function loadData() {
         try {
-          const resp = await fetch(CSV_URL);
+          const resp = await fetch(CSV_URL, { cache: "no-store" });
           if (!resp.ok) throw new Error("HTTP " + resp.status);
           const text = await resp.text();
           const responses = parseCSV(text);
@@ -468,7 +468,7 @@
       }
 
       loadData();
-      setInterval(loadData, 60000);
+      setInterval(loadData, 10000);
     </script>
   </body>
 </html>
