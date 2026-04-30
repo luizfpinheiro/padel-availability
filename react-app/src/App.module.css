@@ -11,7 +11,7 @@
 .title {
   font-size: 20px;
   font-weight: 500;
-  margin-bottom: 0.25rem;
+  margin-bottom: 1rem;
 }
 
 .subtitle {
@@ -104,6 +104,25 @@
   font-weight: 500;
 }
 
+.weekBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 1.5rem;
+}
+
+.responseCount {
+  font-weight: 500;
+  color: #1a1a1a;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .section {
   margin-bottom: 1.5rem;
 }
@@ -124,8 +143,34 @@
   padding: 14px 16px;
   margin-bottom: 8px;
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gameHeader {
+  display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
+}
+
+.gameHeaderTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.filledBadge {
+  margin-left: auto;
+  font-size: 13px;
+  color: #1d9e75;
+  border: 1px solid #1d9e75;
+  border-radius: 8px;
+  padding: 6px 12px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
 }
 
 .gameRank {
@@ -141,18 +186,20 @@
 }
 
 .gameSlot {
-  font-size: 15px;
-  font-weight: 500;
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 4px;
+  flex-direction: column;
+  gap: 1px;
 }
 
-.gameSub {
+.slotName {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.slotTime {
   font-size: 12px;
-  color: #888;
-  margin-top: 2px;
+  font-weight: 400;
+  color: #fff;
 }
 
 .badge {
@@ -173,32 +220,29 @@
   color: #0c447c;
 }
 
-.barWrap {
-  width: 110px;
-  flex-shrink: 0;
-}
-
-.courtBar {
+.courtRow {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 4px;
+  gap: 8px;
 }
 
-.courtBar:last-child {
-  margin-bottom: 0;
-}
-
-.courtBarLabel {
+.courtCount {
   font-size: 11px;
   color: #aaa;
   white-space: nowrap;
-  width: 22px;
-  text-align: right;
+  min-width: 32px;
+}
+
+.courtNames {
+  font-size: 12px;
+  color: #888;
+  flex: 1;
+  min-width: 0;
 }
 
 .barBg {
-  flex: 1;
+  width: 80px;
+  flex-shrink: 0;
   background: #f0f0ee;
   border-radius: 4px;
   height: 6px;
@@ -268,12 +312,8 @@
     padding: 1.25rem 1rem;
   }
 
-  .gameSlot {
-    font-size: 14px;
-  }
-
-  .barWrap {
-    width: 90px;
+  .slotName {
+    font-size: 13px;
   }
 
   .tsTime {
@@ -293,18 +333,26 @@
 
   .metricLabel,
   .updated,
-  .gameSub,
-  .barLabel,
-  .courtBarLabel,
+  .courtNames,
+  .courtCount,
   .tsTime,
   .tsIdx {
     color: #888;
+  }
+
+  .responseCount {
+    color: #e8e8e4;
   }
 
   .gameCard,
   .tsRow {
     background: #242422;
     border-color: #333;
+  }
+
+  .filledBadge {
+    color: #3db888;
+    border-color: #3db888;
   }
 
   .btn {

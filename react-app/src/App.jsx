@@ -1,5 +1,12 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import styles from './App.module.css'
+
+const COURT_FILL_COLORS = {
+  1: '#c5ead8',
+  2: '#7fd3ae',
+  3: '#3db888',
+  4: '#1d9e75',
+}
 
 const CSV_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkUA_4W1NvttLXXqvHI1tb00rjiCG7JvkAqOGyWatNKjRnI55ZP4iX13k5qTej3M84KaO_PgqFuSU6/pub?gid=1763348503&single=true&output=csv'
@@ -63,6 +70,18 @@ function parseCSV(text) {
     .filter((r) => r.name)
 }
 
+function getCurrentWeek() {
+  const now = new Date()
+  const day = now.getDay()
+  const diffToMonday = day === 0 ? -6 : 1 - day
+  const monday = new Date(now)
+  monday.setDate(now.getDate() + diffToMonday)
+  const sunday = new Date(monday)
+  sunday.setDate(monday.getDate() + 6)
+  const fmt = (d) => d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })
+  return `${fmt(monday)} – ${fmt(sunday)} ${sunday.getFullYear()}`
+}
+
 function computeGames(responses) {
   const players = {}
   SLOTS.forEach((s) => { players[s] = [] })
@@ -81,6 +100,7 @@ export default function App() {
   const [lastUpdated, setLastUpdated] = useState(null)
   const [error, setError] = useState(null)
   const [dotOk, setDotOk] = useState(true)
+  const timestampsRef = useRef(null)
 
   const loadData = useCallback(async () => {
     try {
@@ -119,9 +139,6 @@ export default function App() {
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Padel – Weekly Availability</h1>
-      <p className={styles.subtitle}>
-        Live results · form resets every Sunday at 8pm · deadline Tuesday 11:59pm
-      </p>
 
       <div className={styles.topBar}>
         <div className={styles.live}>
@@ -134,11 +151,14 @@ export default function App() {
 
       {error && <div className={styles.errorBox}>{error}</div>}
 
-      <div className={styles.metricGrid}>
-        <Metric label="Responses" value={responses.length || '—'} />
-        <Metric label="Games found" value={games.length || '—'} />
-        <Metric label="Double courts" value={doubles.length || '—'} />
-        <Metric label="Players covered" value={responses.length ? `${covered.size}/10` : '—'} />
+      <div className={styles.weekBar}>
+        <span>Current week: {getCurrentWeek()}</span>
+        <span
+          className={styles.responseCount}
+          onClick={() => timestampsRef.current?.scrollIntoView({ behavior: 'smooth' })}
+        >
+          {responses.length} {responses.length === 1 ? 'response' : 'responses'}
+        </span>
       </div>
 
       <div className={styles.section}>
@@ -152,32 +172,38 @@ export default function App() {
             const count = names.length
             const isDouble = count >= 6
             const numCourts = isDouble ? 2 : 1
+            const filledCourts = Array.from({ length: numCourts }, (_, j) =>
+              names.slice(j * 4, (j + 1) * 4).length
+            ).filter((n) => n === 4).length
             return (
               <div key={sl} className={styles.gameCard}>
-                <div className={styles.gameRank}>{i + 1}</div>
-                <div className={styles.gameInfo}>
-                  <div className={styles.gameSlot}>
-                    {sl}
-                    <span className={`${styles.badge} ${isDouble ? styles.badgeDouble : styles.badgeSingle}`}>
-                      {isDouble ? '2 courts' : '1 court'}
+                <div className={styles.gameHeader}>
+                  <div className={styles.gameHeaderTitle}>
+                    <span className={styles.gameRank}>{i + 1}</span>
+                    <span className={styles.gameSlot}>
+                      <span className={styles.slotName}>{sl.replace(/ \(.*\)$/, '')}</span>
+                      <span className={styles.slotTime}>{(sl.match(/\(.*\)$/) || [])[0]}</span>
                     </span>
                   </div>
-                  <div className={styles.gameSub}>{count} players · {names.join(', ')}</div>
+                  <span className={styles.filledBadge}>
+                   🎾 &nbsp;{filledCourts} {filledCourts === 1 ? 'COURT' : 'COURTS'}
+                  </span>
                 </div>
-                <div className={styles.barWrap}>
-                  {Array.from({ length: numCourts }, (_, j) => {
-                    const courtPlayers = Math.min(4, Math.max(0, count - j * 4))
-                    const courtPct = Math.round((courtPlayers / 4) * 100)
-                    return (
-                      <div key={j} className={styles.courtBar}>
-                        <div className={styles.barBg}>
-                          <div className={styles.barFill} style={{ width: `${courtPct}%` }} />
-                        </div>
-                        <div className={styles.courtBarLabel}>{courtPlayers}/4</div>
+                {Array.from({ length: numCourts }, (_, j) => {
+                  const courtPlayers = names.slice(j * 4, (j + 1) * 4)
+                  const filledCount = courtPlayers.length
+                  const courtPct = Math.round((filledCount / 4) * 100)
+                  const displayNames = courtPlayers.join(', ')
+                  return (
+                    <div key={j} className={styles.courtRow}>
+                      <span className={styles.courtCount}>({filledCount}/4)</span>
+                      <div className={styles.barBg}>
+                        <div className={styles.barFill} style={{ width: `${courtPct}%`, background: COURT_FILL_COLORS[filledCount] }} />
                       </div>
-                    )
-                  })}
-                </div>
+                      <span className={styles.courtNames}>{displayNames}</span>
+                    </div>
+                  )
+                })}
               </div>
             )
           })
@@ -186,7 +212,7 @@ export default function App() {
 
       <hr className={styles.divider} />
 
-      <div className={styles.section}>
+      <div className={styles.section} ref={timestampsRef}>
         <div className={styles.sectionTitle}>Response timestamps</div>
         {sortedResponses.length === 0 ? (
           <div className={styles.empty}>No responses yet</div>
@@ -200,15 +226,6 @@ export default function App() {
           ))
         )}
       </div>
-    </div>
-  )
-}
-
-function Metric({ label, value }) {
-  return (
-    <div className={styles.metric}>
-      <div className={styles.metricLabel}>{label}</div>
-      <div className={styles.metricValue}>{value}</div>
     </div>
   )
 }
