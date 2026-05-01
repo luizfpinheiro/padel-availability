@@ -104,7 +104,8 @@ export default function App() {
 
   const loadData = useCallback(async () => {
     try {
-      const resp = await fetch(CSV_URL, { cache: 'no-store' })
+      const url = CSV_URL + '&t=' + new Date().getTime()
+      const resp = await fetch(url, { cache: 'no-store' })
       if (!resp.ok) throw new Error('HTTP ' + resp.status)
       const text = await resp.text()
       setResponses(parseCSV(text))
@@ -138,7 +139,7 @@ export default function App() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Padel – Weekly Availability</h1>
+      <h1 className={styles.title}>Padel – Week Availability</h1>
 
       <div className={styles.topBar}>
         <div className={styles.live}>
