@@ -91,7 +91,7 @@ function computeGames(responses) {
     })
   })
   return Object.entries(players)
-    .filter(([, names]) => names.length >= 4)
+    .filter(([, names]) => names.length >= 3)
     .sort((a, b) => b[1].length - a[1].length)
 }
 
@@ -182,13 +182,15 @@ export default function App() {
                   <div className={styles.gameHeaderTitle}>
                     <span className={styles.gameRank}>{i + 1}</span>
                     <span className={styles.gameSlot}>
-                      <span className={styles.slotName}>{sl.replace(/ \(.*\)$/, '')}</span>
+                      <span className={styles.slotName}>{sl.replace(/ \(.*\)$/, '')} {count === 3 && <span className={styles.badgeAlmostFull}>1 SPOT LEFT</span>}</span>
                       <span className={styles.slotTime}>{(sl.match(/\(.*\)$/) || [])[0]}</span>
                     </span>
                   </div>
-                  <span className={styles.filledBadge}>
-                   🎾 &nbsp;{filledCourts} {filledCourts === 1 ? 'COURT' : 'COURTS'}
-                  </span>
+                  {filledCourts > 0 && (
+                    <span className={styles.filledBadge}>
+                     🎾 &nbsp;{filledCourts} {filledCourts === 1 ? 'COURT' : 'COURTS'}
+                    </span>
+                  )}
                 </div>
                 {Array.from({ length: numCourts }, (_, j) => {
                   const courtPlayers = names.slice(j * 4, (j + 1) * 4)
