@@ -91,7 +91,7 @@ function computeGames(responses) {
     })
   })
   return Object.entries(players)
-    .filter(([, names]) => names.length >= 3)
+    .filter(([, names]) => names.length >= 2)
     .sort((a, b) => b[1].length - a[1].length)
 }
 
@@ -166,7 +166,7 @@ export default function App() {
         <div className={styles.sectionTitle}>Best slots to play</div>
         {games.length === 0 ? (
           <div className={styles.empty}>
-            {responses.length === 0 ? 'Loading...' : 'No slot with 4+ players yet'}
+            {responses.length === 0 ? 'Loading...' : 'No slot with 2+ players yet'}
           </div>
         ) : (
           games.map(([sl, names], i) => {
