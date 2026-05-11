@@ -182,7 +182,7 @@ export default function App() {
                   <div className={styles.gameHeaderTitle}>
                     <span className={styles.gameRank}>{i + 1}</span>
                     <span className={styles.gameSlot}>
-                      <span className={styles.slotName}>{sl.replace(/ \(.*\)$/, '')} {count === 3 && <span className={styles.badgeAlmostFull}>1 SPOT LEFT</span>}</span>
+                      <span className={styles.slotName}>{sl.replace(/ \(.*\)$/, '')} {count > 0 && count < 4 && <span className={styles.badgeAlmostFull}>{4 - count} SPOT{4 - count === 1 ? '' : 'S'} LEFT</span>}</span>
                       <span className={styles.slotTime}>{(sl.match(/\(.*\)$/) || [])[0]}</span>
                     </span>
                   </div>
